@@ -4,3 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+
+[dev-dependencies]
+pretty_assertions = "1.4"
+
+[[bin]]
+name = "ch1"

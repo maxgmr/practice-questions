@@ -216,6 +216,76 @@ fn rotate_matrix(mut mat: Vec<Vec<[u8; 4]>>) -> Vec<Vec<[u8; 4]>> {
     mat
 }
 
+// 1.8 Zero Matrix
+// If element in MxN matrix == 0, entire row & column set to 0.
+fn zero_matrix(mut mat: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
+    if !mat.is_empty() {
+        let mut zero_cols = vec![false; mat.len()];
+        let mut zero_rows = vec![false; mat[0].len()];
+
+        // Check if matrix rows are all the same length
+        mat.iter().for_each(|row| {
+            if row.len() != zero_rows.len() {
+                panic!("Malformed matrix: Rows not all same length");
+            }
+        });
+
+        for j in 0..mat.len() {
+            #[allow(clippy::needless_range_loop)]
+            for i in 0..mat[0].len() {
+                // i = "x-index"/current row, j = "y-index"/current col
+                if mat[j][i] == 0 {
+                    zero_rows[i] = true;
+                    zero_cols[j] = true;
+                }
+            }
+        }
+        #[allow(clippy::needless_range_loop)]
+        for j in 0..mat.len() {
+            for i in 0..mat[0].len() {
+                if zero_rows[i] || zero_cols[j] {
+                    mat[j][i] = 0;
+                }
+            }
+        }
+    }
+    mat
+}
+
+// 1.9 String Rotation
+// Check if one string is a rotation of another using is_substring
+fn is_substring(needle: &str, haystack: &str) -> bool {
+    haystack.contains(needle)
+}
+
+fn string_rotation(sa: &str, sb: &str) -> bool {
+    if sa.len() == sb.len() {
+        if sa.is_empty() {
+            return true;
+        }
+        for i in 0..sa.len() {
+            if is_substring(&sa[..i], sb) && is_substring(&sa[i..], sb) {
+                return true;
+            }
+        }
+    }
+    false
+}
+
+// Do it using is_substring only once
+fn string_rotation_sub_once(sa: &str, sb: &str) -> bool {
+    if sa.len() == sb.len() {
+        if sa.is_empty() {
+            return true;
+        }
+        let dbl_sa = sa.to_string() + sa;
+        if is_substring(sb, &dbl_sa) {
+            return true;
+        }
+    }
+    false
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -373,6 +443,14 @@ mod tests {
     }
 
     #[test]
+    fn rm_empty() {
+        assert_eq!(
+            Vec::<Vec<[u8; 4]>>::new(),
+            rotate_matrix(Vec::<Vec<[u8; 4]>>::new())
+        );
+    }
+
+    #[test]
     fn rm_1x1() {
         #[allow(clippy::useless_vec)]
         let ans = vec![vec![[0, 0, 0, 0]]];
@@ -458,5 +536,105 @@ mod tests {
             vec![[1, 1, 1, 1], [5, 5, 5, 5], [9, 9, 9, 9], [13, 13, 13, 13]],
         ]);
         assert_eq!(ans, result);
+    }
+
+    #[test]
+    fn zm_1x1_same() {
+        #[allow(clippy::useless_vec)]
+        let ans = vec![vec![0]];
+        let result = zero_matrix(vec![vec![0]]);
+        assert_eq!(ans, result);
+    }
+
+    #[test]
+    fn zm_1x2_zero() {
+        #[allow(clippy::useless_vec)]
+        let ans = vec![vec![0], vec![0]];
+        let result = zero_matrix(vec![vec![0], vec![1]]);
+        dbg!(&ans, &result);
+        assert_eq!(ans, result);
+    }
+
+    #[test]
+    fn zm_2x2_zero() {
+        #[allow(clippy::useless_vec)]
+        let ans = vec![vec![0, 0], vec![0, 4]];
+        let result = zero_matrix(vec![vec![0, 2], vec![3, 4]]);
+        assert_eq!(ans, result);
+    }
+
+    #[test]
+    fn zm_2x2_same() {
+        #[allow(clippy::useless_vec)]
+        let ans = vec![vec![1, 2], vec![3, 4]];
+        let result = zero_matrix(vec![vec![1, 2], vec![3, 4]]);
+        assert_eq!(ans, result);
+    }
+
+    #[test]
+    fn zm_3x2_zero() {
+        #[allow(clippy::useless_vec)]
+        let ans = vec![vec![0, 0, 0], vec![4, 0, 6]];
+        let result = zero_matrix(vec![vec![1, 0, 3], vec![4, 5, 6]]);
+        dbg!(&ans, &result);
+        assert_eq!(ans, result);
+    }
+
+    #[test]
+    fn zm_3x3_double_zero() {
+        #[allow(clippy::useless_vec)]
+        let ans = vec![vec![0, 0, 0], vec![0, 5, 0], vec![0, 0, 0]];
+        let result = zero_matrix(vec![vec![0, 2, 3], vec![4, 5, 6], vec![7, 8, 0]]);
+        assert_eq!(ans, result);
+    }
+
+    #[test]
+    fn is_sub_blank() {
+        assert_eq!(is_substring("", "test"), true);
+    }
+
+    #[test]
+    fn is_sub_dbl_blank() {
+        assert_eq!(is_substring("", ""), true);
+    }
+
+    #[test]
+    fn sr_zero() {
+        assert_eq!(string_rotation("", ""), true);
+    }
+
+    #[test]
+    fn sr_yes() {
+        assert_eq!(string_rotation("waterbottle", "erbottlewat"), true);
+    }
+
+    #[test]
+    fn sr_no() {
+        assert_eq!(string_rotation("blast", "atsbl"), false);
+    }
+
+    #[test]
+    fn sr_mult_first() {
+        assert_eq!(string_rotation("wowZ a", "owZ aw"), true)
+    }
+
+    #[test]
+    fn srso_zero() {
+        assert_eq!(string_rotation_sub_once("", ""), true);
+    }
+
+    #[test]
+    fn srso_yes() {
+        assert_eq!(string_rotation_sub_once("waterbottle", "erbottlewat"), true);
+    }
+
+    #[test]
+    fn srso_no() {
+        assert_eq!(string_rotation_sub_once("blast", "atsbl"), false);
+    }
+
+    #[test]
+    fn srso_mult_first() {
+        assert_eq!(string_rotation_sub_once("wowZ a", "owZ aw"), true)
     }
 }

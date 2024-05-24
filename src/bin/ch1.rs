@@ -5,7 +5,7 @@ fn main() {
     println!("hello!");
 }
 
-// 1.1 Is Unique:
+// 1.1 Is Unique
 // Determine if string has all unique chars
 fn is_unique(input_string: &str) -> bool {
     let mut found_chars: HashMap<char, bool> = HashMap::new();
@@ -36,7 +36,7 @@ fn is_unique_2(input_string: &str) -> bool {
     true
 }
 
-// 1.2 Check Permutation:
+// 1.2 Check Permutation
 // Given two strings, check if one is a permutation of the other.
 fn check_perm(string_a: &str, string_b: &str) -> bool {
     if string_a.len() != string_b.len() {

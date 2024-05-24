@@ -34,6 +34,14 @@ impl<T> List<T> {
         self.head.as_mut().map(|node| &mut node.elem)
     }
 
+    pub fn len(&self) -> usize {
+        self.len
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.head.is_none()
+    }
+
     #[allow(clippy::should_implement_trait)]
     pub fn into_iter(self) -> IntoIter<T> {
         IntoIter(self)
@@ -50,14 +58,6 @@ impl<T> List<T> {
             next: self.head.as_deref_mut(),
         }
     }
-
-    pub fn len(&self) -> usize {
-        self.len
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.head.is_none()
-    }
 }
 impl<T> Drop for List<T> {
     fn drop(&mut self) {
@@ -66,6 +66,14 @@ impl<T> Drop for List<T> {
             cur_link = boxed_node.next.take();
         }
     }
+}
+
+type Link<T> = Option<Box<Node<T>>>;
+
+#[derive(Debug)]
+struct Node<T> {
+    elem: T,
+    next: Link<T>,
 }
 
 pub struct IntoIter<T>(List<T>);
@@ -102,14 +110,6 @@ impl<'a, T> Iterator for IterMut<'a, T> {
             &mut node.elem
         })
     }
-}
-
-type Link<T> = Option<Box<Node<T>>>;
-
-#[derive(Debug)]
-struct Node<T> {
-    elem: T,
-    next: Link<T>,
 }
 
 #[cfg(test)]

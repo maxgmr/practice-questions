@@ -1,5 +1,7 @@
 #![allow(unused)]
 
+use practice_questions::Stack;
+
 fn main() {
     println!("hello!");
 }
@@ -147,29 +149,8 @@ impl<T> SetOfStacks<T> {
     }
 }
 
-struct Stack<T> {
-    stack: Vec<T>,
-}
-impl<T> Stack<T> {
-    fn new() -> Self {
-        Stack { stack: Vec::new() }
-    }
-
-    fn push(&mut self, item: T) {
-        self.stack.push(item)
-    }
-
-    fn pop(&mut self) -> Option<T> {
-        self.stack.pop()
-    }
-
-    fn len(&self) -> usize {
-        self.stack.len()
-    }
-
-    fn is_empty(&self) -> bool {
-        self.stack.len() == 0
-    }
+struct TwoStackQueue<T> {
+    sa: Stack<T>,
 }
 
 #[cfg(test)]

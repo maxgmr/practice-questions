@@ -149,8 +149,52 @@ impl<T> SetOfStacks<T> {
     }
 }
 
+#[derive(Debug, Default)]
 struct TwoStackQueue<T> {
     sa: Stack<T>,
+    sb: Stack<T>,
+}
+impl<T> TwoStackQueue<T> {
+    fn new() -> Self {
+        Self {
+            sa: Stack::new(),
+            sb: Stack::new(),
+        }
+    }
+
+    fn push(&mut self, item: T) {
+        self.sa.push(item);
+    }
+
+    fn pop(&mut self) -> Option<T> {
+        if !self.sb.is_empty() {
+            self.sb.pop()
+        } else {
+            while let Some(val) = self.sa.pop() {
+                self.sb.push(val);
+            }
+            self.sb.pop()
+        }
+    }
+
+    fn peek(&mut self) -> Option<&T> {
+        if !self.sb.is_empty() {
+            self.sb.peek()
+        } else {
+            while let Some(val) = self.sa.pop() {
+                self.sb.push(val);
+            }
+            self.sb.peek()
+        }
+    }
+
+    fn len(&self) -> usize {
+        self.sa.len() + self.sb.len()
+    }
+
+    fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
 }
 
 #[cfg(test)]
@@ -263,5 +307,41 @@ mod tests {
         assert_eq!(sos.pop_at(0), None);
         assert_eq!(sos.pop_at(1), None);
         assert_eq!(sos.pop_at(2), None);
+    }
+
+    #[test]
+    fn tsq_basics() {
+        let mut tsq = TwoStackQueue::<i32>::new();
+
+        assert!(tsq.is_empty());
+        assert_eq!(tsq.len(), 0);
+        assert_eq!(tsq.peek(), None);
+        assert_eq!(tsq.pop(), None);
+
+        tsq.push(1);
+        assert_eq!(tsq.len(), 1);
+        assert!(!tsq.is_empty());
+
+        assert_eq!(tsq.peek(), Some(&1_i32));
+        assert_eq!(tsq.len(), 1);
+        assert!(!tsq.is_empty());
+
+        tsq.push(2);
+        assert_eq!(tsq.len(), 2);
+        assert_eq!(tsq.peek(), Some(&1_i32));
+
+        tsq.push(3);
+        tsq.push(4);
+        assert_eq!(tsq.len(), 4);
+        assert_eq!(tsq.peek(), Some(&1_i32));
+
+        assert_eq!(tsq.pop(), Some(1_i32));
+        assert_eq!(tsq.len(), 3);
+        assert_eq!(tsq.peek(), Some(&2_i32));
+
+        assert_eq!(tsq.pop(), Some(2_i32));
+        assert_eq!(tsq.pop(), Some(3_i32));
+        assert_eq!(tsq.pop(), Some(4_i32));
+        assert_eq!(tsq.pop(), None);
     }
 }

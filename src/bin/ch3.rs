@@ -149,6 +149,8 @@ impl<T> SetOfStacks<T> {
     }
 }
 
+// Q3.4 Queue via Stacks
+// Implement a queue using two stacks.
 #[derive(Debug, Default)]
 struct TwoStackQueue<T> {
     sa: Stack<T>,
@@ -195,6 +197,24 @@ impl<T> TwoStackQueue<T> {
     fn is_empty(&self) -> bool {
         self.len() == 0
     }
+}
+
+// Q3.5 Sort Stack
+// Sort a stack such that the smallest items are on the top using only an additional temporary
+// stack and not by copying the elements into any other data structure. The stack type supports
+// push, pop, peek, and is_empty.
+fn sort_stack<T>(mut stack: Stack<T>) -> Stack<T>
+where
+    T: PartialOrd + PartialEq,
+{
+    let mut helper_stack = Stack::<T>::new();
+    while let Some(elem) = stack.pop() {
+        while !helper_stack.is_empty() && *helper_stack.peek().unwrap() < elem {
+            stack.push(helper_stack.pop().unwrap());
+        }
+        helper_stack.push(elem);
+    }
+    helper_stack
 }
 
 #[cfg(test)]
@@ -343,5 +363,54 @@ mod tests {
         assert_eq!(tsq.pop(), Some(3_i32));
         assert_eq!(tsq.pop(), Some(4_i32));
         assert_eq!(tsq.pop(), None);
+    }
+
+    #[test]
+    fn ss_empty() {
+        let mut start = Stack::<i32>::new();
+        assert_eq!(sort_stack(start).pop(), None);
+    }
+
+    #[test]
+    fn ss_sorted() {
+        let mut start = Stack::<u8>::new();
+
+        start.push(3);
+        start.push(2);
+        start.push(1);
+
+        start = sort_stack(start);
+
+        let a = start.pop();
+        let b = start.pop();
+        let c = start.pop();
+        let d = start.pop();
+
+        assert_eq!(a, Some(1_u8));
+        assert_eq!(b, Some(2_u8));
+        assert_eq!(c, Some(3_u8));
+        assert_eq!(d, None);
+    }
+
+    #[test]
+    fn ss_unsorted() {
+        let mut glossy = Stack::<char>::new();
+
+        glossy.push('s');
+        glossy.push('g');
+        glossy.push('o');
+        glossy.push('l');
+        glossy.push('s');
+        glossy.push('y');
+
+        glossy = sort_stack(glossy);
+
+        assert_eq!(glossy.pop(), Some('g'));
+        assert_eq!(glossy.pop(), Some('l'));
+        assert_eq!(glossy.pop(), Some('o'));
+        assert_eq!(glossy.pop(), Some('s'));
+        assert_eq!(glossy.pop(), Some('s'));
+        assert_eq!(glossy.pop(), Some('y'));
+        assert_eq!(glossy.pop(), None);
     }
 }
